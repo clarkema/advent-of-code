@@ -1,20 +1,44 @@
 #! /usr/bin/env perl6
 
-my @list    = 0..255;
-my @lengths = 34,88,2,222,254,93,150,0,199,255,39,32,137,136,1,167;
-my $cur     = 0;
-my $skip    = 0;
+my @salt = [17, 31, 73, 47, 23];
 
-for @lengths -> $len {
-    my @indexes  = ($cur ..^ $cur + $len).map({$^l % @list});
-    my @reversed = @list[@indexes].reverse;
+sub sparse-hash(@list, @lengths, :$rounds) {
+    my $cur = 0;
+    my $skip = 0;
 
-    for ^@indexes -> $i {
-        @list[@indexes[$i]] = @reversed[$i];
+    for ^$rounds {
+        for @lengths -> $len {
+            my @indexes  = ($cur ..^ $cur + $len).map({$^l % @list});
+            my @reversed = @list[@indexes].reverse;
+
+            for ^@indexes -> $i {
+                @list[@indexes[$i]] = @reversed[$i];
+            }
+
+            $cur = ($cur + $len + $skip) % @list;
+            $skip++;
+        }
     }
 
-    $cur = ($cur + $len + $skip) % @list;
-    $skip++;
+    @list;
 }
 
-say "Finally: ", [*] @list[0,1];
+sub dense-hash(@list, @lengths, :$rounds) {
+    do [+^] $_ for sparse-hash(@list, @lengths, :$rounds).rotor(16);
+}
+
+sub MAIN {
+    my $input = 'day_10.input'.IO.slurp.chomp;
+
+    say "Part 1: ", [*] sparse-hash(
+        (0..255).Array,
+        $input.comb(/\d+/).map(*.Int),
+        :rounds(1)
+    )[0,1];
+
+    say "Part 2: ", dense-hash(
+        (0..255).Array,
+        $input.comb.map(&ord).Array.append(@salt),
+        :rounds(64)
+    ).map(*.fmt("%.2X")).join('');
+}
