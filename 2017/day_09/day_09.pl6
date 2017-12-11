@@ -3,12 +3,12 @@
 #use Grammar::Tracer;
 
 class StreamStats {
-    my $depth = 0;
-    has $.garbage-count is rw  = 0;
-    has $.total-score is rw = 0;
-    method gchar($/) { $.garbage-count++; }
-    method group-start($/) { $depth++ }
-    method group-end($/) { $.total-score += $depth-- }
+    has $!depth = 0;
+    has $.garbage-count = 0;
+    has $.total-score = 0;
+    method gchar($/) { $!garbage-count++; }
+    method group-start($/) { $!depth++ }
+    method group-end($/) { $!total-score += $!depth-- }
 }
 
 grammar Stream {
