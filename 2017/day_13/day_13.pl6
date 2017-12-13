@@ -68,3 +68,16 @@ for ^$f.layers.elems -> $i {
 }
 
 say $cost;
+
+# Brute-force clean path
+
+DELAY:
+for ^Inf -> $delay {
+    for ^$f.layers.elems -> $i {
+        if $f.layers[$i] and ($delay + $i) %% (2 * $f.layers[$i].range - 2) {
+            next DELAY;
+        }
+    }
+    say "Got $delay";
+    exit;
+}
