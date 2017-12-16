@@ -44,3 +44,20 @@ my $actions = DanceActions.new;
 Dance.parse('day_16.input'.IO.slurp.chomp, :$actions);
 
 say "Part 1: ", $actions.programs.join('');
+
+# Ugly brute-force to look for a pattern.  Really ought to extract and
+# reify the computation described by the input rather than just running
+# it in passing by re-running the whold parser, but it's late...
+
+$actions = DanceActions.new;
+my $orig = $actions.programs.clone;
+
+for ^40 -> $i { # 1_000_000_000 % 60
+    Dance.parse('day_16.input'.IO.slurp.chomp, :$actions);
+    say "Part 2: ", $actions.programs.join('');
+
+    #if $actions.programs eqv $orig {
+        #say "Found a loop at $i";   # 60, in this case
+        #exit;
+    #}
+}
