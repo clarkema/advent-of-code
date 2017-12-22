@@ -1,19 +1,25 @@
 #!/usr/bin/env perl6
 
-my Int @instructions = 'day_05.input'.IO.lines.map: *.Int;
-my $index = 0;
-my $stop = @instructions.Int - 1;
+my int @instructions = 'day_05.input'.IO.lines.map: *.Int;
+my int $index = 0;
+my int $stop = @instructions.elems;
+my int $iterations = 0;
+my int $jump;
 
-for 1..Inf -> $i {
-    my $jump = @instructions[$index];
+my $current;
 
-    $jump >= 3 ?? @instructions[$index]--
-               !! @instructions[$index]++;
+while $index < $stop {
+    # Even .AT-POS is relatively expensive.  It's cheaper to bind
+    # the location to $current than it is to subscript twice.
+    $current := @instructions.AT-POS($index);
+    $jump = $current;
 
-    $index += $jump;
+    $jump >= 3 ?? --$current !! ++$current;
 
-    if $index > $stop {
-        say $i;
-        exit;
-    }
+    # This is currently faster than $index += $jump; see
+    # https://github.com/rakudo/rakudo/issues/1329
+    $index = $index + $jump;
+    ++$iterations;
 }
+
+say $iterations;
