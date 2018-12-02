@@ -14,9 +14,9 @@ sub part_2(@lines) {
 
         for @lines -> $cand {
             next if $line eq $cand;
-            my @mask = @master >>eq<< $cand.comb;
-            next if @mask.grep(!*).elems > 1;
-            return join '', ({ $^v if @mask[$^i] } for @master.kv);
+            my @mask = @master Zne $cand.comb;
+            next unless @mask.one;
+            return join '', ({ $^v unless @mask[$^i] } for @master.kv);
         }
     }
 }
